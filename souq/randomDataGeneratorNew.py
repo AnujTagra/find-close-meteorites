@@ -25,17 +25,12 @@ def generateQuantity():
 def generateInboundShipmentDeliveryId():
     return ''.join(random.sample(list(string.digits),8))
 
-def generateContainerIdScannableIdMap(numcontainers):
-    cIdList = [ ''.join(random.sample(list(string.digits),6)) for _ in range(numcontainers)]
-    cscanIdList = ['P-'+random.choice(list(string.digits))+'-'+''.join(random.sample(list(string.digits+string.ascii_uppercase),8)) for _ in range(numcontainers)]
-    cIdScanIdMap =  dict(zip(cIdList , cscanIdList ))
-    return cIdScanIdMap
+def generateReceiveContainerId():
+    return ''.join(random.sample(list(string.digits),6))
 
-def generateReceiveContainerId(randomTupleFromMap):
-    return randomTupleFromMap[0]
+def generateReceiveContainerScannableId():
+    return 'P-'+random.choice(list(string.digits))+'-'+''.join(random.sample(list(string.digits+string.ascii_uppercase),8))
 
-def generateReceiveContainerScannableId(randomTupleFromMap):
-    return randomTupleFromMap[1]
 def generateClientLogin():
     return "kumaranu"
 
@@ -97,17 +92,15 @@ def generateConfirmationDate():
     return int(time.time()-random.randint(100,200))
 
 @click.command()
-@click.option("--numcontainers", default=2, help="Number of containers")
 @click.option("--numrecords", default=2, help="Number of records")
-def generateData(numcontainers,numrecords):
-    cIdScanIdMap = generateContainerIdScannableIdMap(numcontainers)
+def generateData(numrecords):
+    record_list = []
     for i in range(numrecords):
         asin=generateAsin()
         fnSku=generateFnSku(asin)
         fcSku=generateFcSku(fnSku)
-        randomTupleFromMap = random.choice(list(cIdScanIdMap.items()))
-        receiveContainerId=generateReceiveContainerId(randomTupleFromMap)
-        receiveContainerScannableId=generateReceiveContainerScannableId(randomTupleFromMap)
+        receiveContainerId=generateReceiveContainerId()
+        receiveContainerScannableId=generateReceiveContainerScannableId()
         priceFC=generatePriceFC()
         price=generatePrice(priceFC)
         cost=generateCost()
@@ -141,7 +134,10 @@ def generateData(numcontainers,numrecords):
         str(generateOrderType()),
         generateHandler(),
         str(generateConfirmationDate())])
-        print(record)
+        record_list.append(record)
+
+    print(*record_list, sep = "\n")
+
 
 if __name__ == '__main__':
     generateData()
